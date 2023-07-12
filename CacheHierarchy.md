@@ -42,7 +42,9 @@ class DCacheDataArray(implicit p: Parameters) extends L1HellaCacheModule()(p) {
 
 Above is the code for the [L1D Cache](https://github.com/chipsalliance/rocket-chip/blob/master/src/main/scala/rocket/DCache.scala).
 
-It seems like the size can be adjusted by DCacheParams found [here](https://github.com/chipsalliance/rocket-chip/blob/836be7a92e5bd368a8a49f408a44b71c738a9a68/src/main/scala/rocket/HellaCache.scala#L17C1-L57C1).
+Parameters class are defined [here](https://github.com/chipsalliance/cde/blob/384c06b8d45c8184ca2f3fba2f8e78f79d2c1b51/cde/src/chipsalliance/rocketchip/config.scala).
+
+It seems like the size can be adjusted by DCacheParams found [here](https://github.com/chipsalliance/rocket-chip/blob/836be7a92e5bd368a8a49f408a44b71c738a9a68/src/main/scala/rocket/HellaCache.scala#L17C1-L57C1). It is the same as this:
 
 ``` scala
 case class DCacheParams(
@@ -86,8 +88,6 @@ case class DCacheParams(
     require(isPow2(nSets), s"nSets($nSets) must be pow2")
 }
 ```
-
-Parameters class are defined [here](https://github.com/chipsalliance/cde/blob/384c06b8d45c8184ca2f3fba2f8e78f79d2c1b51/cde/src/chipsalliance/rocketchip/config.scala).
 
 So, a translation into gem5 would be:
 
