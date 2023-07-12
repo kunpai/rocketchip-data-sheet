@@ -149,3 +149,17 @@ Some latency in the cache is 2 cycles: is it `tag_latency`, `response_latency` o
 Also, Prefetcher of the L1I Cache should be set to `None`.
 
 We need to _finetune_ `tag_latency`, `response_latency`, `data_latency`, `mshrs`, `tgts_per_mshr`, and the other parameters of the `MMUCache`.
+
+## L2 Cache
+
+The 4 banked L2 Cache does exist, but I haven't been able to find any specifications on it in the rocket-chip repository.
+
+It could be housed [here](https://github.com/sifive/block-inclusivecache-sifive/blob/master/design/craft/inclusivecache/src/Configs.scala)(?) and this was linked in this [issue](https://github.com/chipsalliance/rocket-chip/issues/653) and this [issue](https://github.com/chipsalliance/rocket-chip/issues/2557) in the rocket-chip repository, and I think they auto connect it to Rocket. I also saw this information [here](https://chipyard.readthedocs.io/en/latest/Customization/Memory-Hierarchy.html#the-sifive-l2-cache). If we go by this, it would be a `512 KiB 8-way cache`.
+
+Every parameter in this cache would need to be _finetuned_.
+
+## Cache Hierarchy
+
+Private L1 Shared L2 Cache Hierarchy, as can be seen in this diagram:
+
+![Rocket Chip](./rocket-chip.png)
