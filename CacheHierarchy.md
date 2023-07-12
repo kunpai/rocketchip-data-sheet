@@ -93,6 +93,59 @@ So, a translation into gem5 would be:
 
 ``` python
 L1DCache(size='16KiB', assoc=4, mshrs=1, tgts_per_mshr=16)
+# DTLB Page walk caches
+self.dptw_caches = [
+    MMUCache(size="2KiB")
+    for _ in range(board.get_processor().get_num_cores())
+]
 ```
 
-We would need to _finetune_ `tag_latency`, `data_latency` and `response_latency`.
+We would need to _finetune_ `tag_latency`, `data_latency` and `response_latency`, and the other parameters of the `MMUCache`.
+
+## L1I Cache
+
+Source: [https://github.com/chipsalliance/rocket-chip/blob/master/src/main/scala/rocket/ICache.scala](https://github.com/chipsalliance/rocket-chip/blob/master/src/main/scala/rocket/ICache.scala)
+
+Here are the parameters of interest:
+
+``` scala
+case class ICacheParams(
+    nSets: Int = 64,
+    nWays: Int = 4,
+    rowBits: Int = 128,
+    nTLBSets: Int = 1,
+    nTLBWays: Int = 32,
+    nTLBBasePageSectors: Int = 4,
+    nTLBSuperpages: Int = 4,
+    cacheIdBits: Int = 0,
+    tagECC: Option[String] = None,
+    dataECC: Option[String] = None,
+    itimAddr: Option[BigInt] = None,
+    prefetch: Boolean = false,
+    blockBytes: Int = 64,
+    latency: Int = 2,
+    fetchBytes: Int = 4) extends L1CacheParams {
+  def tagCode: Code = Code.fromString(tagECC)
+  def dataCode: Code = Code.fromString(dataECC)
+  def replacement = new RandomReplacement(nWays)
+}
+```
+
+So, a translation into gem5 would be:
+
+``` python
+L1ICache(size='16KiB', assoc=4)
+# ITLB Page walk caches
+self.iptw_caches = [
+    MMUCache(size="2KiB")
+    for _ in range(board.get_processor().get_num_cores())
+]
+```
+
+We do not have information about `mshrs`, `tgts_per_mshr`.
+
+Some latency in the cache is 2 cycles: is it `tag_latency`, `response_latency` or `data_latency`?
+
+Also, Prefetcher of the L1I Cache should be set to `None`.
+
+We need to _finetune_ `tag_latency`, `response_latency`, `data_latency`, `mshrs`, `tgts_per_mshr`, and the other parameters of the `MMUCache`.
