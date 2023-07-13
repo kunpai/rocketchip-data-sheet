@@ -1,4 +1,4 @@
-# Rocket Core
+# RocketChip Core
 
 ## Multiplication and Division
 
