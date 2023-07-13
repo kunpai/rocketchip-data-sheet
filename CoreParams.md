@@ -1,5 +1,38 @@
 # Rocket Core
 
+## Multiplication and Division
+
+It looks like this is the code for Multiplication and Division latencies:
+
+``` scala
+case class MulDivParams(
+  mulUnroll: Int = 1,
+  divUnroll: Int = 1,
+  mulEarlyOut: Boolean = false,
+  divEarlyOut: Boolean = false,
+  divEarlyOutGranularity: Int = 1
+)
+
+class MulDiv(cfg: MulDivParams, width: Int, nXpr: Int = 32, aluFn: ALUFN = new ALUFN) extends Module {
+  private def minDivLatency = (cfg.divUnroll > 0).option(if (cfg.divEarlyOut) 3 else 1 + w/cfg.divUnroll)
+  private def minMulLatency = (cfg.mulUnroll > 0).option(if (cfg.mulEarlyOut) 2 else w/cfg.mulUnroll)
+```
+
+The value of `w` needs some calculation which seems a bit convoluted for me to figure out the exact value.
+
+I would recommend setting `mulEarlyOut` and `divEarlyOut` both to `true`.
+
+This would make the Core parameters like this in gem5:
+
+``` python
+class RocketIntMulFU(MinorDefaultIntMulFU):
+    opLat = 2
+
+
+class RocketIntDivFU(MinorDefaultIntDivFU):
+    opLat = 3
+```
+
 ## Rocket Branch Predictor
 
 Here are the details for the [branch predictor](https://github.com/chipsalliance/rocket-chip/blob/master/src/main/scala/rocket/BTB.scala):
