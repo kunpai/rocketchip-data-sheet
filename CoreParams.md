@@ -1,6 +1,15 @@
 # RocketChip Core
 
-## Multiplication and Division
+## Integer Instructions
+
+Usually, integer instructions should take one cycle. I have not seen information about the latency of integer instructions in the RocketChip documentation, but let's assume that it is one cycle, and fine-tune it later.
+
+``` python
+class RocketIntAluFU(MinorDefaultIntAluFU):
+    opLat = 1
+```
+
+## Multiplication and Division Instructions
 
 It looks like this is the code for Multiplication and Division latencies:
 
@@ -31,6 +40,48 @@ class RocketIntMulFU(MinorDefaultIntMulFU):
 
 class RocketIntDivFU(MinorDefaultIntDivFU):
     opLat = 3
+```
+
+## Memory Instructions
+
+RocketChip does not give a latency for memory instructions.
+
+However, it does give information about miss penalty. Source: [CS152 Laboratory Exercise 2](https://inst.eecs.berkeley.edu/~cs152/sp18/handouts/lab2-0.2.pdf)
+
+| Microarchitectural Event  | Miss Penalty |
+| ---------- | ------------ |
+| L1 Cache miss | 23 cycles (L2 cache access latency) |
+| L2 Cache miss | 100 cycles (DRAM access latency) |
+| L1 TLB miss | 2 cycles |
+| L2 TLB miss | 3×(2/3×1+1/3×123) cycles |
+| Branch misprediction | 3 cycles |
+| Target address misprediction | 3 cycles |
+
+So, through the above miss penalty information, we can calculate the latency of memory instructions.
+
+``` python
+class RocketLoadStoreFU(MinorDefaultLoadStoreFU):
+    opLat = 42
+```
+
+This value feels a bit high, but I am not sure how to calculate it. This definitely needs more investigation.
+
+## Other FU Pool Parameters
+
+These should be the other parameters of the FU Pool:
+
+``` python
+class RocketFloatSimdFU(MinorDefaultFloatSimdFU):
+    pass
+
+class RocketPredFU(MinorDefaultPredFU):
+    pass
+
+class RocketMiscFU(MinorDefaultMiscFU):
+    pass
+
+class RocketVecFU(MinorDefaultVecFU):
+    pass
 ```
 
 ## Rocket Branch Predictor
